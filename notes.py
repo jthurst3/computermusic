@@ -20,8 +20,18 @@ all_keywords = [
 	'comments', # commentary for the note
 ]
 class Note:
-	global all_keywords
 	def __init__(self, **args):
+		self.type = None
+		self.pitch = None
+		self.rhythm = None
+		self.duration = None
+		self.start_time = None
+		self.end_time = None
+		self.dynamic = None
+		self.volume = None
+		self.articulations = None
+		self.comments = None
+
 		if 'type' in args:
 			self.type = args['type']
 		if 'pitch' in args:
@@ -42,3 +52,34 @@ class Note:
 			self.articulations = args['articulations']
 		if 'comments' in args:
 			self.comments = args['comments']
+
+	# setters
+	def set_type(self, newtype):
+		self.type = newtype
+	def set_pitch(self, newpitch):
+		self.pitch = newpitch
+	def set_rhythm(self, newrhythm):
+		self.rhythm = newrhythm
+	def set_duration(self, newduration):
+		self.duration = newduration
+	def set_start_time(self, newstarttime):
+		self.start_time = newstarttime
+	def set_end_time(self, newendtime):
+		self.end_time = newendtime
+	def set_dynamic(self, newdynamic):
+		self.dynamic = newdynamic
+	def set_volume(self, newvolume):
+		self.volume = newvolume
+	def set_articulations(self, newarticulations):
+		self.articulations = newarticulations
+	def set_comments(self, newcomments):
+		self.comments = newcomments
+
+# checks to see whether something is a Note object
+def isNote(object):
+	return isinstance(object, Note)
+
+
+
+
+
