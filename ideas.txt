@@ -1,0 +1,6 @@
+***ideas.txt***
+
+	Brute force in 2010 was a bad idea for satisfying counterpoint rules...
+		Implement gradient descent, min remaining values, or another better constraint satisfaction technique for species counterpoint.
+	Convert simple tests to unit tests
+	Make one class each for all chords, instruments, scales -- and have a parameter specifying which type of chord/instrument/scale it is

@@ -1,0 +1,86 @@
+***functionality.txt***
+
+Directory of Functionality
+
+Chords -- chords.py
+	Defines classes for musical chords:
+		Major
+		Minor
+		Augmented
+		Diminished
+		Major 7
+		Minor 7
+		Diminished 7
+		Half-diminished 7
+		Dominant 7
+	For each chord:
+		defines name in name attribute
+		defines intervals (in half-steps) for the chord in intervals attribute
+		defines pitches (starting at middle-C) in pitches attribute
+Counterpoint -- counterpoint.py
+	TODO -- Defines general rules for species counterpoint
+Instrumentation -- instruments.py
+	Defines classes for musical instruments (currently only vocal ranges):
+		Soprano
+		Alto
+		Tenor
+		Bass
+	For each instrument:
+		defines name in name attribute
+		defines range of notes possible for that instrument in range attribute
+		defines range of pitches the instrument usually plays in tessitura attribute
+List functionality -- listFunctions.py
+	Contains useful list manipulation functions:
+		cumulativeSum -- returns a running sum of the elements in the given list
+		cumulativeSumZero -- same as cumulativeSum, but with 0 prepended to the result
+Main file -- main.py
+	TODO -- (currently empty)
+Notes -- notes.py
+	Defines a class for notes
+	Each note can have these properties:
+		type (note or rest)
+		pitch (note value)
+		rhythm (rhythm value for the note -- e.g. quarter note = 1/4)
+		duration (amount of time note is played)
+		start_time (start time for note)
+		end_time (end time for note)
+		dynamic (dynamic marking for the note, represented as a number -- e.g. fortissimo = 2)
+		volume (how loud note should be -- number between 0 and 1, with 0 = rest)
+		articulations (list of articulations for the note)
+		comments (commentary for the note)
+	For each property:
+		setter method changes the value of the specified property
+	Function that checks to see whether an object is of the Note class
+Phrases -- phrases.py
+	Defines a class for musical phrases, where a phrase is a list of notes
+	Each possible phrase contains functions that:
+		Check to see if every element in the initial list is indeed a note
+		Insert a note somewhere in the phrase (TODO -- be careful of rhythms)
+	Function that creates a new phrase from a list of note values (pitches)
+Scales -- scales.py
+	Defines classes for musical scales:
+		Major
+		Dorian
+		Phrygian
+		Lydian
+		Mixolydian
+		Minor
+		Natural minor (same as minor)
+		Harmonic minor
+		Melodic minor ascending
+		Melodic minor descending
+		Locrian
+Testing -- testFile.py
+	TODO -- convert tests to unit tests (using unittest package)
+	Contains basic testing functionality for functions defined in this repository:
+		testListFunctions
+		testScales
+
+
+
+
+
+
+
+
+

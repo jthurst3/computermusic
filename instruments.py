@@ -10,7 +10,7 @@
 #	def __init__(self):
 #	 	self.name = "[instrument]" # the name of the instrument
 #	 	self.range = range(lowerbound, upperbound) # list of pitches an instrument can play, with 0 being middle-C
-#	 	self.tessitura = range(lowerbound, upperbound) # list of pitches [in the instrument's tessitura]
+#	 	self.tessitura = range(lowerbound, upperbound) # list of pitches the instrument usually plays
 
 class Soprano:
 	"""Instrument = soprano"""
