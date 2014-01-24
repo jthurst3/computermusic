@@ -39,8 +39,10 @@ var array_equals = function(array1, array2) {
 // tests the fiddletune.js code
 var test_fiddletune = function() {
 	console.log("---Testing file fiddletune.js---");
-	var test1 = test_function("rhythmic_sequence", rhythmic_sequence, [.25,.25,.5], array_equals, [[0,.25],[.25,.5],[.5,1]]);
-	var overall_result = test1;
+	var tests = [];
+	tests.push(test_function("rhythmic_sequence", rhythmic_sequence, [.25,.25,.5], array_equals, [[0,.25],[.25,.5],[.5,1]]));
+	tests.push(test_function("rhythmic_sequence", rhythmic_sequence, [], array_equals, []));
+	var overall_result = all(tests);
 	if(overall_result)
 		success_text = "succeeded";
 	else success_text = "failed";
