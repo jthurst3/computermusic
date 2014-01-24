@@ -51,7 +51,7 @@ var test_fiddletune = function() {
 	var tests = [];
 	tests.push(test_function("rhythmic_sequence", rhythmic_sequence, [.25,.25,.5], array_equals, [[0,.25],[.25,.5],[.5,1]]));
 	tests.push(test_function("rhythmic_sequence", rhythmic_sequence, [], array_equals, []));
-	var overall_result = all(tests);
+	var overall_result = logical_and(tests);
 	if(overall_result)
 		success_text = "succeeded";
 	else success_text = "failed";
