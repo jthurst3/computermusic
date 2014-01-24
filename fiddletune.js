@@ -25,6 +25,22 @@ var rhythmic_sequence = function(rhythm_lengths) {
 	return rhythms;
 }
 
+// creates the notes of the scale between a specified range and in a specific key
+var create_scale = function(lowest_note, highest_note, key) {
+	var all_scale_notes = [];
+	for(var i = lowest_note; i < highest_note; i++) {
+		if(inscale_test([0,2,4,5,7,9,11], i)) {
+			all_scale_notes.push(i);
+		}
+	}
+	return all_scale_notes;
+}
+
+// tests if a specific note is in the scale
+var inscale_test = function(scale_notes, note) {
+	return scale_notes.indexOf(note%12) != -1;
+}
+
 
 
 
