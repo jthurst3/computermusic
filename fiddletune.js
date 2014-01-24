@@ -11,7 +11,6 @@ var fiddletune = function(key) {
 // converts an array of rhythm lengths to an array of rhythms with start and end times
 // e.g. rhythmic_sequence([.25,.25,.5]) => [(0,0.25),(0.25,0.5),(0.5,1)]
 var rhythmic_sequence = function(rhythm_lengths) {
-	var function_name = "rhythmic_sequence";
 	var rhythms = [];
 	var current_time = 0; // keep track of the "current rhythm time"
 	for(var i = 0; i < rhythm_lengths.length; i++) {
