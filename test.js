@@ -36,6 +36,15 @@ var array_equals = function(array1, array2) {
 	return true;
 }
 
+// returns true if all the elements in the array are true
+// used to see if a list of test cases have all passed
+var logical_and = function(array) {
+	for(var i = 0; i < array.length; i++) {
+		if(!array[i]) return false;
+	}
+	return true;
+}
+
 // tests the fiddletune.js code
 var test_fiddletune = function() {
 	console.log("---Testing file fiddletune.js---");
