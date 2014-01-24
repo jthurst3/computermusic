@@ -9,7 +9,7 @@ var fiddletune = function(key) {
 }
 
 // converts an array of rhythm lengths to an array of rhythms with start and end times
-// e.g. rhythmic_sequence([.25,.25,.5]) => [(0,0.25),(0.25,0.5),(0.5,1)]
+// e.g. rhythmic_sequence([.25,.25,.5]) => [[0,0.25],[0.25,0.5],[0.5,1]]
 var rhythmic_sequence = function(rhythm_lengths) {
 	var rhythms = [];
 	var current_time = 0; // keep track of the "current rhythm time"
@@ -17,7 +17,7 @@ var rhythmic_sequence = function(rhythm_lengths) {
 		// for each rhythm length, make an ordered pair whose first element is
 		// the current rhythm time, and whose second element is the current rhythm time
 		// plus the rhythm lenght
-		rhythms.push((current_time, current_time+rhythm_lengths[i]));
+		rhythms.push([current_time, current_time+rhythm_lengths[i]]);
 		// then update the current rhythm time
 		current_time += rhythm_lengths[i];
 	}
