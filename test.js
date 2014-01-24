@@ -22,15 +22,24 @@ var test_function = function(function_name, fun, inputs, equality_test, expected
 	return success; // return whether or not the test succeeded
 }
 
-// checks if two arrays are equal
+// checks if two arrays are equal (or two elements of arrays)
+// modified from http://stackoverflow.com/questions/3115982/how-to-check-javascript-array-equals
 var array_equals = function(array1, array2) {
+	if(array1 === array2) return true;
+	if(array1 == null || array2 == null) return false;
+	if(array1.length != array2.length) return false;
+
+	for(var i = 0; i < array1.length; i++) {
+		if(!array_equals(array1[i], array2[i]))
+			return false;
+	}
 	return true;
 }
 
 // tests the fiddletune.js code
 var test_fiddletune = function() {
 	console.log("---Testing file fiddletune.js---");
-	var test1 = test_function("rhythmic_sequence", rhythmic_sequence, ([.25,.25,.5]),[[0,.25],[.25,.5],[.5,1]]);
+	var test1 = test_function("rhythmic_sequence", rhythmic_sequence, [.25,.25,.5], array_equals, [[0,.25],[.25,.5],[.5,1]]);
 	var overall_result = test1;
 	if(overall_result)
 		success_text = "succeeded";
