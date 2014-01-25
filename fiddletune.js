@@ -38,7 +38,7 @@ var create_scale = function(lowest_note, highest_note, key) {
 
 // tests if a specific note is in the scale
 var inscale_test = function(scale_notes, note) {
-	return scale_notes.indexOf(note%12) != -1;
+	return scale_notes.indexOf(((note%12)+12)%12) != -1;
 }
 
 
