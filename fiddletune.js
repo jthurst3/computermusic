@@ -29,7 +29,7 @@ var rhythmic_sequence = function(rhythm_lengths) {
 var create_scale = function(lowest_note, highest_note, key) {
 	var all_scale_notes = [];
 	for(var i = lowest_note; i <= highest_note; i++) {
-		if(inscale_test([0,2,4,5,7,9,11].map(function(elem) {return elem+key}), i)) {
+		if(inscale_test([0,2,4,5,7,9,11].map(function(elem) {return (elem+key)%12}), i)) {
 			all_scale_notes.push(i);
 		}
 	}
