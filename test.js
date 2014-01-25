@@ -51,8 +51,11 @@ var test_fiddletune = function() {
 	var tests = [];
 	tests.push(test_function("rhythmic_sequence", rhythmic_sequence, [[.25,.25,.5]], array_equals, [[0,.25],[.25,.5],[.5,1]]));
 	tests.push(test_function("rhythmic_sequence", rhythmic_sequence, [[]], array_equals, []));
-	tests.push(test_function("create_scale", create_scale, [-5,27,0], array_equals, 
+	tests.push(test_function("create_scale", create_scale, [-5,26,0], array_equals, 
 		[-5, -3, -1, 0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26]));
+	tests.push(test_function("create_scale", create_scale, [-5,26,1], array_equals,
+		[-4, -2, 0, 1, 3, 5, 6, 8, 10, 12, 13, 15, 17, 18, 20, 22, 24, 25]));
+	tests.push(test_function("create_scale", create_scale, [24,0,0], array_equals, []));
 	var overall_result = logical_and(tests);
 	if(overall_result)
 		success_text = "succeeded";
