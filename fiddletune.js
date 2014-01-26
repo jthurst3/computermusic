@@ -36,6 +36,15 @@ var create_scale = function(lowest_note, highest_note, key) {
 	return all_scale_notes;
 }
 
+// creates the rhythm sequences allowed for the reel
+var create_rhythmic_sequences = function() {
+	var rhythm_durations = [[1],[.5,.5],[.5,.25,.25],[.25,.25,.125,.125,.25],[.25,.25,.25,.25],[.25,.25,.5]]; // a list of durations
+	var sequences = rhythm_durations.map(function(sequence) {
+		return rhythmic_sequence(sequence);
+	}); // maps the durations to start and end times
+	return sequences; // return the array of arrays of start and end times
+}
+
 // tests if a specific note is in the scale
 var inscale_test = function(scale_notes, note) {
 	return scale_notes.indexOf(((note%12)+12)%12) != -1;
