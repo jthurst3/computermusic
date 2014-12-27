@@ -4,6 +4,16 @@
 // Adapted from Mathematica code written in 2010-2011
 // January 24, 2014
 
+// range function
+// produces an array that starts at the start point and ends at the end point (exclusive)
+var range = function(start, end) {
+	var arr = [];
+	for (var i = start; i < end; i++) {
+		arr.push(i);
+	};
+	return arr;
+};
+
 // a list of durations
 var rhythm_durations = [[1],[.5,.25,.25],[.25,.25,.125,.125,.25],[.25,.25,.25,.25],[.5,.5],[.25,.25,.5]];
 // the violin can't go below open G, and we'll limit the violin so it can't go above the E
@@ -16,6 +26,8 @@ var base_notes = {
 	"augmented": [0, 4, 8],
 	"diminished": [0, 3, 6]
 };
+// assuming C major, the notes in the scale
+var major_scale = [0,2,4,5,7,9,11];
 
 // function that creates the fiddle tune (reel)
 // generates the rhythms, then the notes.
@@ -125,7 +137,7 @@ var generate_notes = function(key, A, B) {
 	// determine the distribution of the notes in each chord
 	var notes_in_chords = function() {
 		notes = [];
-		for (var i = 0; i < chord.length; i++) {
+		for (var i = 0; i < chords.length; i++) {
 			notes.push(determine_notes_from_chord(chords[i]));
 		};
 		return notes;
@@ -134,12 +146,12 @@ var generate_notes = function(key, A, B) {
 	var first_A = pick_first_note(notes_in_chords[0], true);
 	var first_B = pick_first_note(notes_in_chords[0], false);
 	// pick the first notes of every other rhythmic sequence according to a random walk
-	var second_A = list_random_walk(first_A, notes_in_chords, 0.5, 0.5);
-	var second_B = list_random_walk(first_B, notes_in_chords, 0.5, 0.5);
+	var second_A = lists_random_walk(first_A, notes_in_chords, 0.5, 0.5);
+	var second_B = lists_random_walk(first_B, notes_in_chords, 0.5, 0.5);
 	// pick all the notes for the A and the B part by alternating between "scalar random walks"
 	// and "chord random walks"
-	var notes_A = pick_notes(second_A, A);
-	var notes_B = pick_notes(second_B, B);
+	var notes_A = pick_notes(key, notes_in_chords, second_A, A);
+	var notes_B = pick_notes(key, notes_in_chords, second_B, B);
 	// return a flattened list of the notes
 	return flatten_lists(notes_A, notes_B);
 };
@@ -174,18 +186,78 @@ var determine_notes_from_chord = function(chord) {
 	});
 	// sort these notes (this does an in-place sort)
 	notes_in_chord.sort();
-	// go through the notes playable on the violin, and figure out
-	// whether each note falls in the chord
-	var notes = [];
-	for (var i = 0; i < range_of_violin.length; i++) {
-		if (notes_in_chord.indexOf(positive_mod(range_of_violin[i], 12)) != -1) {
-			notes.push(range_of_violin[i]);
-		};
-	};
 	// finally, return the list of notes (should be in sorted order)
+	return all_notes_in_range(notes_in_chord);
+};
+
+// picks a first note for a given section (A or R) of the fiddle tune
+// first will be true if we want to pick a note for the A section,
+// false otherwise.
+// Notes will be sampled from a normal distribution
+var pick_first_note = function(notes_in_chord, first) {
+	// if the A section, we'll use the lower notes
+	// if the B section, we'll use the upper notes
+	var notes = function() {
+		if (first) {
+			return notes_in_chord.slice(0, notes_in_chord.length/2);
+		} else {
+			return notes_in_chord.slice(notes_in_chord.length/2, notes_in_chord.length);
+		};
+	}();
+	// now we'll sample the notes from a normal distribution ("pseudo" normal)
+	return normal_choice(notes, 5);
+};
+
+// picks the rest of the notes in a section according to a random walk
+// will return notes in the same structure as the rhythms
+var pick_notes = function(key, notes_in_chords, base_notes, rhythms) {
+	// determine the notes in the scale
+	var notes_in_scale = major_scale.map(function(num) {
+		return positive_mod(num+key, 12);
+	});
+	notes_in_scale.sort();
+	var scale = all_notes_in_range(notes_in_scale);
+	// go through the rhythms, and alternate between random walking
+	// over the scale and random walking over the chord
+	var notes = [];
+	for (var i = 0; i < base_notes.length; i++) {
+		// random walk over the chord
+		var n1 = delete_five(random_walk(base_notes[i], notes_in_chords[i], rhythms[2*i].length, 0.5, 0.5));
+		// console.log(n1);
+		notes.push(n1);
+		// random walk over the scale
+		var n2 = delete_five(random_walk(base_notes[i], scale, rhythms[2*i+1].length, 0.5, 0.5));
+		// console.log(n2);
+		notes.push(n2);
+	};
 	return notes;
 };
 
+// returns a sorted list of all the notes playable on the violin that are
+// a part of the subset of notes between 0 and 11
+var all_notes_in_range = function(base_notes) {
+	// go through the notes playable on the violin, and figure out
+	// whether each note is valid given the base notes
+	var notes = [];
+	for (var i = 0; i < range_of_violin.length; i++) {
+		if (base_notes.indexOf(positive_mod(range_of_violin[i], 12)) != -1) {
+			notes.push(range_of_violin[i]);
+		};
+	};
+	return notes;
+};
+
+// delete_five function
+// given a list of notes in 1 second,
+// if there is a list of 5 notes, it "reduces" this list
+// to something that's more like what would be found in a reel
+var delete_five = function(notes) {
+	if (notes.length === 5) {
+		return [notes[0], notes[1], notes[1], notes[1], notes[1]];
+	} else {
+		return notes;
+	}
+};
 
 
 
@@ -231,7 +303,72 @@ var create_rhythmic_sequences = function() {
 // tests if a specific note is in the scale
 var inscale_test = function(scale_notes, note) {
 	return scale_notes.indexOf(((note%12)+12)%12) != -1;
-}
+};
+
+// random walk over a list
+// input = a starting number, a list, the number of times to walk, and the probabilities
+// of going left or right
+// output = a list of random numbers from the list
+// NOTE: the first number must be in the list
+// NOTE: the lists must be sorted
+// e.g. random_walk(4, [-5,0,4,7,12], 10, 0.5, 0.5)
+// --> [4,0,4,7,12,7,12,7,4,0]
+var random_walk = function(number, list, length, left, right) {
+	var numbers = [number];
+	for (var i = 0; i < length-1; i++) {
+		var last = numbers[numbers.length-1];
+		// this problem reduces to calling lists_random_walk on two lists length-1 times
+		numbers.push(lists_random_walk(last, [[last], list], left, right)[1]);
+	};
+	return numbers;
+};
+
+
+// random walk over several lists
+// input = a number, a list of sorted lists of distinct numbers, and a probability of going left or right
+// output = a list of random numbers, one from each list, picked according
+// to the probabilities of going left or right
+// NOTE: it is recommended that each list of numbers is non-empty. If it is
+// empty, the function will return the previous selected element as the "choice"
+// for that list
+// NOTE: The first number must be in the first list
+// e.g. lists_random_walk(5,[[1,3,5,6],[2,4,7],[4,5,6,7],[0,1,2]], 0.5, 0.5)
+// --> [5,4,5,2]
+var lists_random_walk = function(number, lists, left, right) {
+	var choices = [number];
+	for (var i = 1; i < lists.length; i++) {
+		// for each list, make a random choice of going left or right
+		// first, make sure we can either go left or right
+		var last_choice = choices[choices.length-1];
+		if (lists[i].length == 0) {
+			// the list is empty, so append the last choice to the list
+			choices.push(last_choice);
+		} else if (lists[i].length == 1) {
+			// the list has one element, so append it to the choices
+			choices.push(lists[i][0]);
+		} else if (lists[i][0] >= last_choice) {
+			// everything is at least as large as the last choice, so append the first element
+			// that's strictly larger than the last choice
+			if (lists[i][0] === last_choice) choices.push(lists[i][1]);
+			else choices.push(lists[i][0]);
+		} else if (lists[i][lists[i].length-1] <= last_choice) {
+			// everything is at least as small as the last choice, so append the last element
+			// that's strictly smaller than the last choice
+			if (lists[i][lists[i].length-1] === last_choice) choices.push(lists[i][lists[i].length-2]);
+			else choices.push(lists[i][lists[i].length-1]);
+		} else {
+			// some numbers are to the left and some are to the right,
+			// so go through the lists and find the elements just in-between the last choice
+			var small_list = lists[i].filter(function(num) {return num < last_choice;});
+			var large_list = lists[i].filter(function(num) {return num > last_choice;});
+			var small = small_list[small_list.length-1];
+			var large = large_list[0];
+			// pick the next number according to the left and right probabilities
+			choices.push(random_choice([left, right], [small, large]));
+		}
+	};
+	return choices;
+};
 
 
 // randomly picks a value from a list, with weights on each choice
@@ -243,10 +380,7 @@ var random_choice = function(weights, choices) {
 		return choices[Math.floor(Math.random() * choices.length)];
 	};
 	// compute the sum of unnormalized probabilities
-	var total = 0;
-	for (var i = 0; i < weights.length; i++) {
-		total += weights[i];
-	};
+	var total = sum(weights);
 	// generate the random number
 	var rand = Math.random() * total;
 	var count = 0;
@@ -260,14 +394,17 @@ var random_choice = function(weights, choices) {
 	console.log("Cound not pick a random number...");
 };
 
-// range function
-// produces an array that starts at the start point and ends at the end point (exclusive)
-var range = function(start, end) {
-	var arr = [];
-	for (var i = start; i < end; i++) {
-		arr.push(i);
-	};
-	return arr;
+// randomly picks a value from a list, according to a normal
+// distribution with mean = the average value, with the
+// given standard deviation
+var normal_choice = function(choices, stdev) {
+	// figure out the mean of the numbers
+	var mean = average(choices);
+	// generate the random number
+	// from http://www.protonfish.com/random.shtml
+	var rand = ((Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1))*stdev+mean;
+	// find the nearest number in choices to the random number
+	return nearest(choices, rand);
 };
 
 // positive_mod function
@@ -280,7 +417,42 @@ var positive_mod = function(a, b) {
 	return mod;
 };
 
-console.log(fiddletune(3));
+// sum function
+// returns the sum of a list of numbers
+var sum = function(numbers) {
+	var total = 0;
+	for (var i = 0; i < numbers.length; i++) {
+		total += numbers[i];
+	};
+	return total;
+};
+
+// average function
+// returns the mean of a list of numbers
+var average = function(numbers) {
+	return sum(numbers)/numbers.length;
+};
+
+// nearest function
+// returns the nearest number in a list to the given number
+// TODO: most lists that will be given to this function will be sorted,
+// so should we make this logarithmic time and assume the lists will be sorted?
+var nearest = function(numbers, num) {
+	var diff = Infinity;
+	var index = -1;
+	// keep a running tab of the lowest difference encountered between
+	// the given number and a number in the list
+	for (var i = 0; i < numbers.length; i++) {
+		var abs = Math.abs(numbers[i] - num);
+		if (abs < diff) {
+			diff = abs;
+			index = i;
+		};
+	};
+	return numbers[index];
+};
+
+console.log(fiddletune(11));
 
 
 
