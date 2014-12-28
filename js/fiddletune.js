@@ -38,10 +38,10 @@ var fiddletune = function(key) {
 	// generate the rhythms (in duration form)
 	var A = generate_rhythms_for_part(true);
 	var B = generate_rhythms_for_part(false);
-	var rhythms = flatten_lists(A, B);
+	var rhythms = flatten_lists(repeat(A, 2), repeat(B, 2));
 	// generate the notes
 	var notes = generate_notes(key, A, B);
-	// combine them together
+	// combine them together, making sure to repeat the A and B parts
 	return [notes, rhythmic_sequence(rhythms)];
 };
 
@@ -127,6 +127,16 @@ var flatten_lists = function(A, B) {
 	return flattened;
 };
 
+// copies a list structure a certain number of times
+// http://stackoverflow.com/questions/1374126/how-to-extend-an-existing-javascript-array-with-another-array
+var repeat = function(list, num) {
+	var newlist = [];
+	for (var i = 0; i < num; i++) {
+		newlist.push.apply(newlist, list);
+	};
+	return newlist;
+}
+
 // generates notes for the fiddle tune
 // takes in the root note of the key signature,
 // and the rhythms for the A and B parts
@@ -152,8 +162,9 @@ var generate_notes = function(key, A, B) {
 	// and "chord random walks"
 	var notes_A = pick_notes(key, notes_in_chords, second_A, A);
 	var notes_B = pick_notes(key, notes_in_chords, second_B, B);
-	// return a flattened list of the notes
-	return flatten_lists(notes_A, notes_B);
+	// return a flattened list of the notes, repeating the A and B part
+	// TODO: this is sort of an ugly way of combining...
+	return flatten_lists(repeat(notes_A, 2), repeat(notes_B, 2));
 };
 
 // determines the chords of each part of the fiddle tune
