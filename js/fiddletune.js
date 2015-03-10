@@ -10,12 +10,12 @@ var range = function(start, end) {
 	var arr = [];
 	for (var i = start; i < end; i++) {
 		arr.push(i);
-	};
+	}
 	return arr;
 };
 
 // a list of durations
-var rhythm_durations = [[1],[.5,.25,.25],[.25,.25,.125,.125,.25],[.25,.25,.25,.25],[.5,.5],[.25,.25,.5]];
+var rhythm_durations = [[1],[0.5,0.25,0.25],[0.25,0.25,0.125,0.125,0.25],[0.25,0.25,0.25,0.25],[0.5,0.5],[0.25,0.25,0.5]];
 // the violin can't go below open G, and we'll limit the violin so it can't go above the E
 // one octave above open E
 var range_of_violin = range(-5, 27);
@@ -80,6 +80,7 @@ var generate_rhythms_for_part = function(first) {
 				case r6: return random_choice(null, [r4,r6]); break;
 				case r5: return random_choice(null, [r4,r5]); break;
 				case r2: return r4; break;
+				default: break;
 			}
 		} else {
 			switch(choice2) {
@@ -87,8 +88,11 @@ var generate_rhythms_for_part = function(first) {
 				case r6: return r6; break;
 				case r5: return r5; break;
 				case r2: return r2; break;
+				default: break;
 			}			
 		}
+		// should never get here
+		return -1;
 	}();
 	// the fourth choice will be between r2, r4, r5, and r6
 	var choice4 = random_choice(null, [r2, r4, r5, r6]);
@@ -114,16 +118,17 @@ var generate_rhythms_for_part = function(first) {
 // flattens two lists of depth 2
 var flatten_lists = function(A, B) {
 	var flattened = [];
-	for (var i = 0; i < A.length; i++) {
+	var i;
+	for (i = 0; i < A.length; i++) {
 		A[i].map(function(r) {
 			flattened.push(r);
 		});
-	};
-	for (var i = 0; i < B.length; i++) {
+	}
+	for (i = 0; i < B.length; i++) {
 		B[i].map(function(r) {
 			flattened.push(r);
 		});
-	};
+	}
 	return flattened;
 };
 
@@ -133,9 +138,9 @@ var repeat = function(list, num) {
 	var newlist = [];
 	for (var i = 0; i < num; i++) {
 		newlist.push.apply(newlist, list);
-	};
+	}
 	return newlist;
-}
+};
 
 // generates notes for the fiddle tune
 // takes in the root note of the key signature,
@@ -149,7 +154,7 @@ var generate_notes = function(key, A, B) {
 		notes = [];
 		for (var i = 0; i < chords.length; i++) {
 			notes.push(determine_notes_from_chord(chords[i]));
-		};
+		}
 		return notes;
 	}();
 	// pick the first note of the A and the B part at random (according to a normal distribution)
@@ -213,7 +218,7 @@ var pick_first_note = function(notes_in_chord, first) {
 			return notes_in_chord.slice(0, notes_in_chord.length/2);
 		} else {
 			return notes_in_chord.slice(notes_in_chord.length/2, notes_in_chord.length);
-		};
+		}
 	}();
 	// now we'll sample the notes from a normal distribution ("pseudo" normal)
 	return normal_choice(notes, 5);
@@ -240,7 +245,7 @@ var pick_notes = function(key, notes_in_chords, base_notes, rhythms) {
 		var n2 = delete_five(random_walk(base_notes[i], scale, rhythms[2*i+1].length, 0.5, 0.5));
 		// console.log(n2);
 		notes.push(n2);
-	};
+	}
 	return notes;
 };
 
@@ -253,8 +258,8 @@ var all_notes_in_range = function(base_notes) {
 	for (var i = 0; i < range_of_violin.length; i++) {
 		if (base_notes.indexOf(positive_mod(range_of_violin[i], 12)) != -1) {
 			notes.push(range_of_violin[i]);
-		};
-	};
+		}
+	}
 	return notes;
 };
 
@@ -289,27 +294,27 @@ var rhythmic_sequence = function(rhythm_lengths) {
 	}
 	// finally, return the list of start and end times
 	return rhythms;
-}
+};
 
 // creates the notes of the scale between a specified range and in a specific key
 var create_scale = function(lowest_note, highest_note, key) {
 	var all_scale_notes = [];
 	for(var i = lowest_note; i <= highest_note; i++) {
-		if(inscale_test([0,2,4,5,7,9,11].map(function(elem) {return (elem+key)%12}), i)) {
+		if(inscale_test([0,2,4,5,7,9,11].map(function(elem) {return (elem+key)%12;}), i)) {
 			all_scale_notes.push(i);
 		}
 	}
 	return all_scale_notes;
-}
+};
 
 // creates the rhythm sequences allowed for the reel
 var create_rhythmic_sequences = function() {
-	var rhythm_durations = [[1],[.5,.5],[.5,.25,.25],[.25,.25,.125,.125,.25],[.25,.25,.25,.25],[.25,.25,.5]]; // a list of durations
+	var rhythm_durations = [[1],[0.5,0.5], [0.5,0.25,0.25],[0.25,0.25,0.125,0.125,0.25],[0.25,0.25,0.25,0.25],[0.25,0.25,0.5]]; // a list of durations
 	var sequences = rhythm_durations.map(function(sequence) {
 		return rhythmic_sequence(sequence);
 	}); // maps the durations to start and end times
 	return sequences; // return the array of arrays of start and end times
-}
+};
 
 // tests if a specific note is in the scale
 var inscale_test = function(scale_notes, note) {
@@ -330,7 +335,7 @@ var random_walk = function(number, list, length, left, right) {
 		var last = numbers[numbers.length-1];
 		// this problem reduces to calling lists_random_walk on two lists length-1 times
 		numbers.push(lists_random_walk(last, [[last], list], left, right)[1]);
-	};
+	}
 	return numbers;
 };
 
@@ -351,7 +356,7 @@ var lists_random_walk = function(number, lists, left, right) {
 		// for each list, make a random choice of going left or right
 		// first, make sure we can either go left or right
 		var last_choice = choices[choices.length-1];
-		if (lists[i].length == 0) {
+		if (lists[i].length === 0) {
 			// the list is empty, so append the last choice to the list
 			choices.push(last_choice);
 		} else if (lists[i].length == 1) {
@@ -377,7 +382,7 @@ var lists_random_walk = function(number, lists, left, right) {
 			// pick the next number according to the left and right probabilities
 			choices.push(random_choice([left, right], [small, large]));
 		}
-	};
+	}
 	return choices;
 };
 
@@ -389,7 +394,7 @@ var lists_random_walk = function(number, lists, left, right) {
 var random_choice = function(weights, choices) {
 	if (weights === null) {
 		return choices[Math.floor(Math.random() * choices.length)];
-	};
+	}
 	// compute the sum of unnormalized probabilities
 	var total = sum(weights);
 	// generate the random number
@@ -401,8 +406,9 @@ var random_choice = function(weights, choices) {
 		if (rand < count) {
 			return choices[i];
 		}
-	};
+	}
 	console.log("Cound not pick a random number...");
+	return -1;
 };
 
 // randomly picks a value from a list, according to a normal
@@ -434,7 +440,7 @@ var sum = function(numbers) {
 	var total = 0;
 	for (var i = 0; i < numbers.length; i++) {
 		total += numbers[i];
-	};
+	}
 	return total;
 };
 
@@ -458,8 +464,8 @@ var nearest = function(numbers, num) {
 		if (abs < diff) {
 			diff = abs;
 			index = i;
-		};
-	};
+		}
+	}
 	return numbers[index];
 };
 
