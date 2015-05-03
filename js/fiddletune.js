@@ -42,6 +42,7 @@ var fiddletune = function(key) {
 	// generate the notes
 	var notes = generate_notes(key, A, B);
 	// combine them together, making sure to repeat the A and B parts
+	// console.log([notes, rhythmic_sequence(rhythms)]);
 	return [notes, rhythmic_sequence(rhythms)];
 };
 
